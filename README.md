@@ -12,7 +12,20 @@ A short video on X: my AI agent builds a tiny browser game — Neon Snake — fr
 mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
 ```
 
-`main.ts` copies `POST.json` (the posted video's address on X) to `/output/POST.json`, where the gate reads it.
+`main.ts` copies `POST.json` (the posted video's address on X) to `/output/POST.json`, where the gate reads it. It first checks that `POST.json` names a real X post (`https://x.com/<handle>/status/<id>`), so a placeholder address fails loudly instead of reaching the gate.
+
+## The video
+
+A 47-second vertical clip (1080x1920, 30 fps), made and rendered in the agent's session with ffmpeg:
+
+1. Hook — "ONE PROMPT. ONE AGENT. ONE GAME."
+2. The prompt — the single line that asked for a neon snake game.
+3. The agent at work — real lines from `game.html` and the headless test result (59 ticks, score 50).
+4. The finished game, played for real — Neon Snake running, score climbing to 100.
+5. The call to build — "YOUR TURN. One prompt, your game. Build on make.fun."
+6. make.fun's referral end card from the press pack, with the entrant's own referral code typed in.
+
+The post's text carries the bounty line and the entrant's play code, as the bounty's rules require.
 
 ---
 

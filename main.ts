@@ -11,16 +11,34 @@
 // Outside the grader's container, MAKEFUN_BOT_DIR and MAKEFUN_OUTPUT_DIR stand in for /bot and /output:
 //   mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
 
-import { copyFileSync, mkdirSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const BOT_DIR = process.env.MAKEFUN_BOT_DIR ?? '/bot';
 const OUTPUT_DIR = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 
+// This entry's program, written for the X-video bounty: the video itself is
+// the entry (an agent building a tiny browser game from one prompt, ending
+// with make.fun's referral end card), and the post that carries it is handed
+// in through POST.json. Before copying, validate that POST.json names a real
+// X post: a placeholder address must fail loudly here instead of reaching
+// the gate as a valid-looking entry.
+function readPostUrl(): string {
+  const raw = readFileSync(join(BOT_DIR, 'POST.json'), 'utf8');
+  const parsed: unknown = JSON.parse(raw);
+  const url = (parsed as { url?: unknown }).url;
+  if (typeof url !== 'string' || !/^https:\/\/(x\.com|twitter\.com)\/\S+\/status\/\d+$/.test(url)) {
+    throw new Error(`POST.json does not name a real X post: ${String(url)}`);
+  }
+  return url;
+}
+
 mkdirSync(OUTPUT_DIR, { recursive: true });
 try {
+  const url = readPostUrl();
   copyFileSync(join(BOT_DIR, 'POST.json'), join(OUTPUT_DIR, 'POST.json'));
+  console.log(`Entering X post: ${url}`);
 } catch (err) {
-  console.error(`POST.json could not be copied from ${BOT_DIR}: ${(err as Error).message}`);
+  console.error(`POST.json could not be entered from ${BOT_DIR}: ${(err as Error).message}`);
   process.exit(1);
 }
